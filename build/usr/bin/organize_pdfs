@@ -1,0 +1,150 @@
+#!/bin/bash
+
+
+calculate_accuracy() {
+   programming_dirs=(
+      "./Python/python.pdf"
+      "./Java/java.pdf"
+      "./Clang/clang.pdf"
+   )
+
+   math_dirs=(
+      "./Linear_Algebra/linear_algebra.pdf"
+      "./Calculus/calculus.pdf"
+   )
+
+   ai_dirs=(
+      "./Machine_Learning/machine_learning.pdf"
+      "./Neural_Networks/neural_networks.pdf"
+   )
+
+   database_dirs=(
+      "./SQL/sql.pdf"
+      "./NoSQL/nosql.pdf"
+   )
+
+   security_dirs=(
+      "./Cryptography/cryptography.pdf"
+      "./Networks_Security/network_security.pdf"
+   )
+   expected_dirs=("${programming_dirs[@]}" "${ai_dirs[@]}" "${math_dirs[@]}" "${database_dirs[@]}" "${security_dirs[@]}")
+
+   actual_programming_dirs=($(find Programming -type f))
+   actual_ai_dirs=($(find AI -type f))
+   actual_math_dirs=($(find Math -type f))
+   actual_database_dirs=($(find Database -type f))
+   actual_security_dirs=($(find Security -type f))
+   acutal_dirs=("${actual_programming_dirs[@]}" "${actual_ai_dirs[@]}" "${actual_math_dirs[@]}" "${actual_database_dirs[@]}" "${actual_security_dirs[@]}")
+
+   # Calculate the accuracy for each folder
+   expected=${#programming_dirs[@]}
+   actual=${#actual_programming_dirs[@]}
+   programming_acc=$((actual * 100 / expected))
+
+   expected=${#math_dirs[@]}
+   actual=${#actual_math_dirs[@]}
+   math_acc=$((actual * 100 / expected))
+   
+   expected=${#ai_dirs[@]}
+   actual=${#actual_ai_dirs[@]}
+   ai_acc=$((actual * 100 / expected))
+
+   expected=${#database_dirs[@]}
+   actual=${#actual_database_dirs[@]}
+   database_acc=$((actual * 100 / expected))
+
+   expected=${#security_dirs[@]}
+   actual=${#actual_security_dirs[@]}
+   security_acc=$((actual * 100 / expected))
+
+   # Calculate the overall accuracy
+   total_expected=${#expected_dirs[@]}
+   total_actual=${#acutal_dirs[@]}
+   overall_acc=$((total_actual * 100 / total_expected))
+
+   # Print the results
+   echo ""
+   echo "Analysis Report:"
+   echo "----------------"
+   echo "Programming: ${programming_acc}%"
+   echo "Math: ${math_acc}%"
+   echo "AI: ${ai_acc}%"
+   echo "Database: ${database_acc}%"
+   echo "Security: ${security_acc}%"
+   echo ""
+
+   echo "Correctness Score: ${overall_acc}%"
+   echo ""
+}
+
+
+declare -A categories=(
+    [Programming]="Python Java Clang"
+    [AI]="Machine_Learning Neural_Networks"
+    [Math]="Linear_Algebra Calculus"
+    [Database]="SQL NoSQL"
+    [Security]="Cryptography Networks_Security"
+)
+
+if [ -z "$1" ]; then
+    echo "usage: orginze_pdfs [root_folder] [-test]"
+    exit 1
+else
+   if [[ ! -d "$1" ]]; then
+      mkdir -p "$1"
+      cd "$1"
+   else
+      echo "Error: Folder $1 already exists"
+      exit 1
+   fi
+fi
+
+for category in "${!categories[@]}"; do
+    mkdir -p "$category"
+    for subcategory in ${categories[$category]}; do
+        mkdir "$category/$subcategory"
+    done
+done
+
+categorize() {
+   declare -A categories=(
+   [Programming]="Python Java Clang"
+   [AI]="Machine_Learning Neural_Networks"
+   [Math]="Linear_Algebra Calculus"
+   [Database]="SQL NoSQL"
+   [Security]="Cryptography Networks_Security"
+   )
+
+   file="$1"
+   for category in "${!categories[@]}"; do
+      for subcategory in ${categories[$category]}; do
+
+         pdf_text=$(pdftotext "$file" - | head -n10)
+         is_subcategory=$(echo "$pdf_text" | grep -i "\\b$(echo "$subcategory" | cut -d'_' -f1)\\b")
+         if [[ $is_subcategory ]]; then
+            mv "$file" "$category/$subcategory/" 
+            return
+         fi
+
+      done
+   done
+}
+
+export -f categorize
+
+files=(../*.pdf)
+
+parallel -j "${#files[@]}" categorize ::: "${files[@]}" 
+
+tree
+
+if [ "$2" == "-test" ]; then
+   echo "!!!! You must name the pdfs in the name of their subcategory for this to work !!!!"
+   calculate_accuracy
+fi
+
+read -p "Is it okay to move the files to the corresponding folders? (y/n) " answer
+case $answer in
+  n|N ) mv */*/*.pdf .. && rm -rf "../$1";;
+  * ) exit 0;;
+esac

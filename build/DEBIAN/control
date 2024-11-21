@@ -1,0 +1,8 @@
+Package: organize-pdfs
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: all
+Depends: poppler-utils, parallel, tree
+Maintainer: Adnan, Noureddine, Osama
+Description: A utility to organize PDF files.
