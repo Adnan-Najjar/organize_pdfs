@@ -107,6 +107,10 @@ calculate_accuracy() {
 
     # find all files and count them
     total_files=$(find . -type f | wc -l)
+    if [[ $total_files -eq 0 ]]; then
+        echo "Error: No files found in the current directory"
+        exit 1
+    fi
 
     report=()
     for cat in "${!categories[@]}"; do
