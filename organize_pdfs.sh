@@ -27,6 +27,10 @@ while [[ "$#" -gt 0 ]]; do
             fi
 
             if [[ ! -d "$2" && ${#2} -gt 0 ]]; then
+                if [[ $(find . -maxdepth 1 -type f -name "*.pdf" | wc -l) -eq 0 ]]; then
+                    echo "Error: No pdf files found in the current directory"
+                    usage
+                fi
                 ROOT_FOLDER="$2"
                 shift 2
             else
