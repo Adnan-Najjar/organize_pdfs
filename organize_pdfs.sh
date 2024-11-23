@@ -5,7 +5,8 @@ ROOT_FOLDER=""
 
 usage() {
     echo "--------------------------------------------------------------------------------"
-    echo "Usage: $0 [--root <folder>] [--report]"
+    echo "Usage: $0 --root <folder> [--report]"
+    echo "NOTE: Make sure you are in the directory with the pdfs to categorize."
     echo ""
     echo "Options:"
     echo "  --root <folder>   Specify the root folder where the categorized files will be moved"
