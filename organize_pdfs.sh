@@ -114,7 +114,7 @@ calculate_accuracy() {
         cat_num=$(find ./${cat}/ -type f | wc -l)
 
         # Calculate the percentage
-        precentage=$((cat_num*100/total_files))
+        precentage=$(($cat_num*100/$total_files))
 
         # Add the percentage to the report
         report+=("$cat: $precentage%\n")
