@@ -100,34 +100,30 @@ categorize() {
 calculate_accuracy() {
     source ../config.sh
 
-
+    # find all files and count them
     total_files=$(find . -type f | wc -l)
-    correct_overall=()
+
     report=()
     for cat in "${!categories[@]}"; do
-        correct_cat=0
-        cat_files=$(find ./${cat}/ -type f | wc -l)
-        for subcat in ${categories[$cat]}; do
-            for pdf in $(find ./${cat}/${subcat}/ -type f); do
-                read -p "Is ${pdf} in the correct category? (y/n) " answer
-                case $answer in
-                    n|N ) continue;;
-                    * ) correct_cat=$((correct_cat+1));;
-                esac
-            done
-        done
-        correct_overall=$((correct_overall+correct_cat))
-        cat_accuracy=$(($correct_cat*100/$cat_files))
-        report+=("$cat: $cat_accuracy%\n")
+        # find all files in the current category and count them
+        cat_num=$(find ./${cat}/ -type f | wc -l)
+
+        # Calculate the percentage
+        precentage=$((cat_num*100/total_files))
+
+        # Add the percentage to the report
+        report+=("$cat: $precentage%\n")
     done
 
+    read -p "How many files are incorrectly categorized? (0/$total_files) " incorrect
+
     # Calculate the accuracy
-    accuracy=$((correct_overall*100/$total_files))
+    accuracy=$((($total_files-$incorrect)*100/$total_files))
 
     echo ""
-    echo "Analysis Report:"
-    echo "----------------"
-    echo -e "${report[@]}"
+    echo " Analysis Report:"
+    echo " ----------------"
+    echo -e " ${report[@]}"
     echo "Correctness Score: ${accuracy}%"
 }
 export -f categorize
