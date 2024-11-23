@@ -3,20 +3,34 @@
 REPORT=0
 ROOT_FOLDER=""
 
+usage() {
+    echo "--------------------------------------------------------------------------------"
+    echo "Usage: $0 [--root <folder>] [--report]"
+    echo ""
+    echo "Options:"
+    echo "  --root <folder>   Specify the root folder where the categorized files will be moved"
+    echo "  --report          Calculate the accuracy of the categorization"
+    echo "--------------------------------------------------------------------------------"
+    exit 1
+}
+
+if [[ $# -eq 0 ]]; then
+    usage
+fi
+
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --root)
             if [[ -z "$2" ]]; then
-                echo "Usage: $0 --root <folder>"
-                exit 1
+                usage
             fi
 
-            if [[ ! -d "$2" ]]; then
+            if [[ ! -d "$2" && ${#2} -gt 0 ]]; then
                 ROOT_FOLDER="$2"
                 shift 2
             else
                 echo "Error: Folder $2 already exists"
-                exit 1
+                usage
             fi
             ;;
         --report)
@@ -25,7 +39,7 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         *)
             echo "Unknown argument: $1"
-            exit 1
+            usage
             ;;
     esac
 done
