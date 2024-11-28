@@ -27,7 +27,7 @@ while [[ "$#" -gt 0 ]]; do
             fi
 
             if [[ ! -d "$2" && ${#2} -gt 0 ]]; then
-                if [[ $(find . -maxdepth 1 -type f -name "*.pdf" | wc -l) -eq 0 ]]; then
+                if [[ $(ls *.pdf | wc -l) -eq 0 ]]; then
                     echo "Error: No pdf files found in the current directory"
                     usage
                 fi
@@ -107,10 +107,6 @@ calculate_accuracy() {
 
     # find all files and count them
     total_files=$(find . -type f | wc -l)
-    if [[ $total_files -eq 0 ]]; then
-        echo "Error: No files found in the current directory"
-        exit 1
-    fi
 
     report=()
     for cat in "${!categories[@]}"; do
